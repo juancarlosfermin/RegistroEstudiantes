@@ -1,0 +1,47 @@
+﻿@page "/estudiantes/index"
+@inject EstudianteService estudianteService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<h3>Indice de Estudiantes</h3>
+
+<div class="mb-3">
+    <a href="/estudiantes/create" class="btn btn-success">Crear Nuevo</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombres</th>
+            <th>Email</th>
+            <th>Edad</th>
+            <th>Editar</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in lista)
+        {
+            <tr>
+                <td>@item.EstudianteId</td>
+                <td>@item.Nombres</td>
+                <td>@item.Email</td>
+                <td>@item.Edad</td>
+                <td>
+                    <a href="/estudiantes/edit/@item.EstudianteId" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public List<EstudianteEntity> lista { get; set; } = new List<EstudianteEntity>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lista = await estudianteService.ObtenerTodos();
+    }
+}

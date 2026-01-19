@@ -1,0 +1,54 @@
+﻿@page "/estudiantes/create"
+@inject EstudianteService estudianteService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<h3>Crear Estudiante</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
+<EditForm Model="estudiante" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombres</label>
+        <InputText class="form-control" @bind-Value="estudiante.Nombres" />
+        <ValidationMessage For="@(() => estudiante.Nombres)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="estudiante.Email" />
+        <ValidationMessage For="@(() => estudiante.Email)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Edad</label>
+        <InputNumber class="form-control" @bind-Value="estudiante.Edad" />
+        <ValidationMessage For="@(() => estudiante.Edad)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/estudiantes/index" class="btn btn-secondary">Volver</a>
+</EditForm>
+
+@code {
+    public EstudianteEntity estudiante { get; set; } = new EstudianteEntity();
+    public string mensaje { get; set; } = "";
+
+    private async Task Guardar()
+    {
+        if (await estudianteService.Guardar(estudiante))
+        {
+            navigationManager.NavigateTo("/estudiantes/index");
+        }
+        else
+        {
+            mensaje = "Error: Ya existe un estudiante registrado con ese nombre.";
+        }
+    }
+}
