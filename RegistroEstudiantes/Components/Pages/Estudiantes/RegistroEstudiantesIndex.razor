@@ -1,12 +1,20 @@
-﻿@page "/estudiantes/index"
+@page "/estudiantes/index"
 @inject EstudianteService estudianteService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 <h3>Indice de Estudiantes</h3>
 
-<div class="mb-3">
-    <a href="/estudiantes/create" class="btn btn-success">Crear Nuevo</a>
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="input-group">
+            <input class="form-control" @bind="filtro" placeholder="Buscar por nombre..." />
+            <button class="btn btn-primary" @onclick="Buscar">Buscar</button>
+        </div>
+    </div>
+    <div class="col-md-3 text-end">
+        <a href="/estudiantes/create" class="btn btn-success">Crear Nuevo</a>
+    </div>
 </div>
 
 <table class="table table-striped">
@@ -39,9 +47,24 @@
 
 @code {
     public List<EstudianteEntity> lista { get; set; } = new List<EstudianteEntity>();
+    public string filtro { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         lista = await estudianteService.ObtenerTodos();
+    }
+
+    private async Task Buscar()
+    {
+        var todos = await estudianteService.ObtenerTodos();
+
+        if (!string.IsNullOrWhiteSpace(filtro))
+        {
+            lista = todos.Where(e => e.Nombres.ToLower().Contains(filtro.ToLower())).ToList();
+        }
+        else
+        {
+            lista = todos;
+        }
     }
 }
