@@ -3,6 +3,7 @@
 @using RegistroEstudiantes.DAL
 @inject AsignaturaService asignaturaService
 @inject NavigationManager navigationManager
+@inject AlertaService alertaService
 @rendermode InteractiveServer
 
 <h3>Crear Asignatura</h3>
@@ -27,7 +28,6 @@
         <InputText class="form-control" @bind-Value="asignatura.Nombre" />
         <ValidationMessage For="@(() => asignatura.Nombre)" />
     </div>
-    
 
     <div class="mb-3">
         <label>Aula</label>
@@ -53,6 +53,8 @@
     {
         if (await asignaturaService.Guardar(asignatura))
         {
+            alertaService.Mostrar("Asignatura creada correctamente", "success");
+
             navigationManager.NavigateTo("/asignaturas/index");
         }
         else
