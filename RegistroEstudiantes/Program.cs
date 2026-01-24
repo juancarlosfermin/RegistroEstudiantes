@@ -13,6 +13,7 @@ builder.Services.AddDbContext<Contexto>(options =>
     options.UseSqlServer(ConStr));
 
 builder.Services.AddScoped<EstudianteService>();
+builder.Services.AddScoped<AsignaturaService>();
 
 var app = builder.Build();
 
