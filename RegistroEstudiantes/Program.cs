@@ -12,6 +12,7 @@ var ConStr = builder.Configuration.GetConnectionString("ConStr");
 builder.Services.AddDbContext<Contexto>(options =>
     options.UseSqlServer(ConStr));
 
+builder.Services.AddScoped<AlertaService>();
 builder.Services.AddScoped<EstudianteService>();
 builder.Services.AddScoped<AsignaturaService>();
 
