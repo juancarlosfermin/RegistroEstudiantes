@@ -1,0 +1,29 @@
+@using RegistroEstudiantes.Services
+@inject AlertaService Alerta
+@implements IDisposable
+@rendermode InteractiveServer
+
+@if (Alerta.Mensaje != null)
+{
+    <div class="alert alert-@Alerta.Tipo alert-dismissible fade show shadow mb-3" role="alert" style="z-index: 9999;">
+        <i class="bi bi-info-circle-fill me-2"></i> @Alerta.Mensaje
+        <button type="button" class="btn-close" @onclick="Cerrar" aria-label="Close"></button>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        Alerta.OnChange += StateHasChanged;
+    }
+
+    private void Cerrar()
+    {
+        Alerta.Limpiar();
+    }
+
+    public void Dispose()
+    {
+        Alerta.OnChange -= StateHasChanged;
+    }
+}
