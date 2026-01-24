@@ -1,0 +1,62 @@
+﻿@page "/asignaturas/create"
+@using RegistroEstudiantes.Services
+@using RegistroEstudiantes.DAL
+@inject AsignaturaService asignaturaService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<h3>Crear Asignatura</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
+<EditForm Model="asignatura" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Codigo</label>
+        <InputText class="form-control" @bind-Value="asignatura.Codigo" />
+        <ValidationMessage For="@(() => asignatura.Codigo)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <InputText class="form-control" @bind-Value="asignatura.Nombre" />
+        <ValidationMessage For="@(() => asignatura.Nombre)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Aula</label>
+        <InputText class="form-control" @bind-Value="asignatura.Aula" />
+        <ValidationMessage For="@(() => asignatura.Aula)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Creditos</label>
+        <InputNumber class="form-control" @bind-Value="asignatura.Creditos" />
+        <ValidationMessage For="@(() => asignatura.Creditos)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/asignaturas/index" class="btn btn-secondary">Volver</a>
+</EditForm>
+
+@code {
+    public AsignaturaEntity asignatura { get; set; } = new AsignaturaEntity();
+    public string mensaje { get; set; } = "";
+
+    private async Task Guardar()
+    {
+        if (await asignaturaService.Guardar(asignatura))
+        {
+            navigationManager.NavigateTo("/asignaturas/index");
+        }
+        else
+        {
+            mensaje = "Error: Ya existe una asignatura con ese nombre o codigo";
+        }
+    }
+}
