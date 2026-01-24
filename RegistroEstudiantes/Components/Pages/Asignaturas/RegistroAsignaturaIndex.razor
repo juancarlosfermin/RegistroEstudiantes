@@ -1,7 +1,13 @@
-﻿@page "/asignaturas/index"
+@page "/asignaturas/index"
+@using RegistroEstudiantes.Services
 @inject AsignaturaService asignaturaService
 @inject NavigationManager navigationManager
+@inject AlertaService alertaService
 @rendermode InteractiveServer
+
+
+@*  PumpDev *@
+
 
 <div class="card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -12,6 +18,16 @@
     </div>
 
     <div class="card-body">
+
+        @if (alertaService.Mensaje != null)
+        {
+            <div class="alert alert-@alertaService.Tipo alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @alertaService.Mensaje
+                <button type="button" class="btn-close" @onclick="CerrarAlerta" aria-label="Close"></button>
+            </div>
+        }
+
+
         <div class="row mb-3">
             <div class="col-md-4">
                 <label class="form-label text-secondary">Filtrar por</label>
@@ -79,6 +95,11 @@
     protected override async Task OnInitializedAsync()
     {
         lista = await asignaturaService.ObtenerTodos();
+    }
+
+    private void CerrarAlerta()
+    {
+        alertaService.Limpiar();
     }
 
     private async Task Buscar()
