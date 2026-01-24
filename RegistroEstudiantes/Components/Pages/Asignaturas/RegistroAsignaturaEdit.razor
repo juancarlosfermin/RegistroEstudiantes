@@ -1,8 +1,9 @@
-﻿@page "/asignaturas/edit/{AsignaturaId:int}"
+@page "/asignaturas/edit/{AsignaturaId:int}"
+@using RegistroEstudiantes.Services
 @inject AsignaturaService asignaturaService
 @inject NavigationManager navigationManager
+@inject AlertaService alertaService
 @rendermode InteractiveServer
-
 
 <h3>Editar Asignatura</h3>
 
@@ -64,6 +65,8 @@
     {
         if (await asignaturaService.Guardar(asignatura))
         {
+            alertaService.Mostrar("Asignatura modificada correctamente", "success");
+
             navigationManager.NavigateTo("/asignaturas/index");
         }
         else
@@ -76,6 +79,8 @@
     {
         if (await asignaturaService.Eliminar(AsignaturaId))
         {
+            alertaService.Mostrar("Asignatura eliminada correctamente", "warning");
+
             navigationManager.NavigateTo("/asignaturas/index");
         }
         else
