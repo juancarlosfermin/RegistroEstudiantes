@@ -3,45 +3,99 @@
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
-<h3>Indice de Estudiantes</h3>
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Registro de Estudiantes</h5>
+        <a href="/estudiantes/create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Crear
+        </a>
+    </div>
 
-<div class="mb-3">
-    <a href="/estudiantes/create" class="btn btn-success">Crear Nuevo</a>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label text-secondary">Filtrar por</label>
+                <select class="form-select" @bind="filtro">
+                    <option value="" selected disabled>Elija una opcion</option>
+                    <option value="id">EstudianteId</option>
+                    <option value="nombre">Nombres</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label text-secondary">Busqueda</label>
+                <div class="input-group">
+                    <input class="form-control" @bind="valorFiltro" placeholder="Buscar" />
+                    <button class="btn btn-outline-primary" @onclick="Buscar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">EstudianteId</th>
+                        <th scope="col">Nombres</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Edad</th>
+                        <th scope="col">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in lista)
+                    {
+                        <tr>
+                            <td>@item.EstudianteId</td>
+                            <td>@item.Nombres</td>
+                            <td>@item.Email</td>
+                            <td><strong>@item.Edad</strong></td>
+                            <td>
+                                <a href="/estudiantes/edit/@item.EstudianteId" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer text-muted">
+        Cantidad: @lista.Count
+    </div>
 </div>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombres</th>
-            <th>Email</th>
-            <th>Edad</th>
-            <th>Editar</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in lista)
-        {
-            <tr>
-                <td>@item.EstudianteId</td>
-                <td>@item.Nombres</td>
-                <td>@item.Email</td>
-                <td>@item.Edad</td>
-                <td>
-                    <a href="/estudiantes/edit/@item.EstudianteId" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 
 @code {
     public List<EstudianteEntity> lista { get; set; } = new List<EstudianteEntity>();
+    public string filtro { get; set; } = "id";
+    public string valorFiltro { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         lista = await estudianteService.ObtenerTodos();
+    }
+
+    private async Task Buscar()
+    {
+        if (string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            lista = await estudianteService.ObtenerTodos();
+        }
+        else
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int id))
+            {
+                var resultado = await estudianteService.Buscar(id);
+                lista = resultado != null ? new List<EstudianteEntity> { resultado } : new List<EstudianteEntity>();
+            }
+            else if (filtro == "nombre")
+            {
+                var todos = await estudianteService.ObtenerTodos();
+                lista = todos.Where(e => e.Nombres.ToLower().Contains(valorFiltro.ToLower())).ToList();
+            }
+        }
     }
 }
