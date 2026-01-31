@@ -15,6 +15,7 @@ builder.Services.AddDbContext<Contexto>(options =>
 builder.Services.AddScoped<AlertaService>();
 builder.Services.AddScoped<EstudianteService>();
 builder.Services.AddScoped<AsignaturaService>();
+builder.Services.AddScoped<TipoPuntoService>();
 
 var app = builder.Build();
 
