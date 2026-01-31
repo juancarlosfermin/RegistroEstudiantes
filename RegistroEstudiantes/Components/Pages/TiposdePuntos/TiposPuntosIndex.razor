@@ -1,0 +1,123 @@
+@page "/tiposdepuntos/index"
+@inject TipoPuntoService tipoPuntoService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Registro de Tipos de Puntos</h5>
+        <a href="/tiposdepuntos/create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Crear
+        </a>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label text-secondary">Filtrar por</label>
+                <select class="form-select" @bind="filtro">
+                    <option value="" selected disabled>Elija una opcion</option>
+                    <option value="id">TipoId</option>
+                    <option value="nombre">Nombre</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label text-secondary">Busqueda</label>
+                <div class="input-group">
+                    <input class="form-control" @bind="valorFiltro" placeholder="Buscar" />
+                    <button class="btn btn-outline-primary" @onclick="Buscar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">TipoId</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col" class="text-center">Color</th>
+                        <th scope="col" class="text-center">Icono</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in lista)
+                    {
+                        <tr>
+                            <td>@item.TipoId</td>
+                            <td>@item.Nombre</td>
+                            <td>@item.Descripcion</td>
+                            <td><strong>@item.ValorPuntos</strong></td>
+
+                            <td class="text-center">
+                                <div style="width: 25px; height: 25px; background-color: @item.Color; border-radius: 50%; border: 1px solid #ccc; margin: 0 auto;"></div>
+                            </td>
+
+                            <td class="text-center">
+                                <i class="@item.Icono fs-4"></i>
+                            </td>
+
+                            <td>
+                                @if (item.Activo)
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactivo</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="/tiposdepuntos/edit/@item.TipoId" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer text-muted">
+        Cantidad: @lista.Count
+    </div>
+</div>
+
+@code {
+    public List<TiposPuntosEntity> lista { get; set; } = new List<TiposPuntosEntity>();
+    public string filtro { get; set; } = "id";
+    public string valorFiltro { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        lista = await tipoPuntoService.ObtenerTodos();
+    }
+
+    private async Task Buscar()
+    {
+        if (string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            lista = await tipoPuntoService.ObtenerTodos();
+        }
+        else
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int id))
+            {
+                var resultado = await tipoPuntoService.Buscar(id);
+                lista = resultado != null ? new List<TiposPuntosEntity> { resultado } : new List<TiposPuntosEntity>();
+            }
+            else if (filtro == "nombre")
+            {
+                var todos = await tipoPuntoService.ObtenerTodos();
+                lista = todos.Where(a => a.Nombre.ToLower().Contains(valorFiltro.ToLower())).ToList();
+            }
+        }
+    }
+}
