@@ -1,0 +1,107 @@
+@page "/tiposdepuntos/edit/{TipoId:int}"
+@inject TipoPuntoService tipoPuntoService
+@inject NavigationManager navigationManager
+@inject AlertaService alertaService
+@rendermode InteractiveServer
+
+<h3>Editar Tipo de Punto</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
+<EditForm Model="tipoPunto" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <InputText class="form-control" @bind-Value="tipoPunto.Nombre" />
+        <ValidationMessage For="@(() => tipoPunto.Nombre)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Descripción</label>
+        <InputText class="form-control" @bind-Value="tipoPunto.Descripcion" />
+        <ValidationMessage For="@(() => tipoPunto.Descripcion)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Valor de Puntos</label>
+        <InputNumber class="form-control" @bind-Value="tipoPunto.ValorPuntos" />
+        <ValidationMessage For="@(() => tipoPunto.ValorPuntos)" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Color</label>
+            <InputText type="color" class="form-control form-control-color" @bind-Value="tipoPunto.Color" />
+            <ValidationMessage For="@(() => tipoPunto.Color)" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Icono</label>
+            <InputSelect class="form-select" @bind-Value="tipoPunto.Icono">
+                <option value="" selected disabled>Seleccione un icono</option>
+                <option value="bi bi-star-fill">⭐ Estrella</option>
+                <option value="bi bi-trophy-fill">🏆 Trofeo</option>
+                <option value="bi bi-dash-circle-fill">⛔ Signo Negativo</option>
+            </InputSelect>
+            <ValidationMessage For="@(() => tipoPunto.Icono)" />
+        </div>
+    </div>
+
+    <div class="mb-3 form-check">
+        <InputCheckbox class="form-check-input" @bind-Value="tipoPunto.Activo" />
+        <label class="form-check-label">¿Activo?</label>
+        <ValidationMessage For="@(() => tipoPunto.Activo)" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+    <a href="/tiposdepuntos/index" class="btn btn-secondary">Volver</a>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int TipoId { get; set; }
+
+    public TiposPuntosEntity tipoPunto { get; set; } = new TiposPuntosEntity();
+    public string mensaje { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var encontrado = await tipoPuntoService.Buscar(TipoId);
+        if (encontrado != null)
+        {
+            tipoPunto = encontrado;
+        }
+    }
+
+    private async Task Modificar()
+    {
+        if (await tipoPuntoService.Guardar(tipoPunto))
+        {
+            alertaService.Mostrar("Tipo de punto modificado correctamente", "success");
+            navigationManager.NavigateTo("/tiposdepuntos/index");
+        }
+        else
+        {
+            mensaje = "No se pudo modificar. Verifique si el nombre ya existe.";
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        if (await tipoPuntoService.Eliminar(TipoId))
+        {
+            alertaService.Mostrar("Tipo de punto eliminado correctamente", "warning");
+            navigationManager.NavigateTo("/tiposdepuntos/index");
+        }
+        else
+        {
+            mensaje = "No se pudo eliminar el registro.";
+        }
+    }
+}
